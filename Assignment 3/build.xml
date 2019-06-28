@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project default='JavaCalc'>
+
+	<target name="JavaCalc" depends='compile'>
+		<java classname='JavaCalc'>
+			<classpath>
+				<pathelement path="${classpath}" />
+				<pathelement location="." />
+			</classpath>
+			<arg value='input.infix' />
+		</java>
+	</target>
+
+	<target name="compile">
+		<javac srcdir='./' includes='JavaCalc.java, Token.java, opType.java, Operator.java, Operand.java' includeantruntime = "false" />
+
+	</target>
+	
+	<target name="doc" description="generate documentation">
+		<javadoc destdir='./docs' sourcefiles = 'JavaCalc.java, Token.java, opType.java, Operator.java, Operand.java' />
+	<echo message="Javadocs has been created!" />
+	</target>
+</project>
