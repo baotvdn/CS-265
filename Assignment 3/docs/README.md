@@ -1,0 +1,31 @@
+Input file which has the infix expression below:
+
+67 + 12 - 45
+
+34 - 17 + 3
+
+4 * ( 5 - 3 )
+
+7 / 6 % 2
+	
+13 + 23 - 42 * 2
+
+3 * ( 5 - 2 ) % 5
+The output should be
+
+34
+
+20
+
+8
+
+1
+	
+-48
+	
+4
+
+The ant targets are 
+	- "compile" to compile all the source files 
+	-	"JavaCalc" which depends on "compile" to run the main file
+	- "doc" to generate documentation. doc runs javadoc on all of the source files, creating files in ./docs.
