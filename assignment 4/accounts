@@ -1,0 +1,179 @@
+#!/usr/bin/python
+"""	Bao Dang
+		Assignment 4
+		12/11/16
+		Plaform: UNIX(TUX)
+		Description: The program allows the user to view account info, and history, and to add transactions"""
+import sys 
+import time
+import os 
+import random
+
+class accounts():
+	
+	def __init__(self, act):
+		self.info = []
+		self.ID = []
+		self.action = act
+		
+	def information(self,ID):
+		"""This method shows all information of an account such as ID number, Name, and Balance
+		The balance is calculated by adding the amount of money from each transaction
+		If the account is deposited, the balance is added. Otherwise, it is subtracted"""
+		balance = 0
+		name = None
+		for line in self.info:
+			if int(ID) == int(line[0]):
+				name = line[1]
+				if line[3] == "D":
+					balance += float(line[4])
+				else:
+					balance -= float(line[4])
+		print "\naccount #: %s" %ID
+		print "     name: %s" %name
+		if balance >= 0:
+			print "  balance: $%.2f" %balance
+		else:
+			print "  balance: -$%.2f" % abs(balance)
+			
+	def history(self,ID):
+		"""This method show all of the transactions of an account"""
+		print "\n"
+		for line in self.info:
+			if int(ID) == int(line[0]):
+				if line[3] == "D":
+					print "\t%s deposit $%.2f" %(line[2],float(line[4]))
+				else:
+					print "\t%s withdrawal $%.2f" % (line[2], float(line[4]))
+	
+	def transaction(self,ID):
+		"""This method is to insert transactions of an account into the file"""
+		date = (time.strftime("%y.%m.%d"))
+		action = raw_input("withdrawal or deposit?(Enter initial) ").upper()
+		amount = float(raw_input("Amount: "))
+		name = None
+		for line in self.info:
+			if int(ID) == int(line[0]):
+				name = line[1]
+		new_transaction = [ID,name,date,action,amount]
+		self.info.append(new_transaction)
+		
+		with open("temp.db", "a") as myfile:
+			myfile.write("%s:%s:%s:%s:%.2f\n" % (ID, name, date, action, amount))
+		
+		print "Transaction DONE!!!"
+		
+	def create_account(self):
+		"""This method is to create a new account. The ID number is created randomly that is 
+		different from the ID numbers that already exist"""
+		name = raw_input("Enter the name: ")
+		date = (time.strftime("%y.%m.%d"))
+		ID = random.randint(1000, 9999)
+		while ID in self.ID:
+			ID = random.randint(1000,9999)
+	
+		print "The new account has ID = %d and Name = %s" %(ID, name)
+		with open("temp.db", "a") as myfile:
+			myfile.write("%s:%s:%s:%s:%s\n" % (ID, name, date, 'D', 0))
+	
+	def activity_screen(self,data):
+		"""This method is to display working activity. If it is transaction, there will be
+		"create an account" option."""
+		for line in data:
+			account = line.split(':')
+			self.ID.append(line[0])
+			self.info.append(account)
+		
+		while 1:
+			counter = 1
+			account_list = []
+			if self.action == "-i":
+				print "\nInfo"
+				print "----"
+			elif self.action == "-h":
+				print "\nHistory"
+				print "-------"
+			elif self.action == "-t":
+				print "\nTransaction"
+				print "------------------"
+			elif self.action == "-?":
+				print "\nUsage Messages"
+				print "-----------------------"
+				print "-i for showing account information"
+				print "-h for showing transaction history"
+				print "-t for creating a new account or adding a new transaction"
+				print "-? show this message"
+				exit()
+			
+			for line in self.info:
+				info = [line[1], line[0]]
+				if info not in account_list:
+					account_list.append(info)
+			
+			account_list = sorted(account_list)
+			for account in account_list:
+				print "%s) %s %s" % (counter, account[0],account[1])
+				counter+=1
+			
+			if self.action == "-t":
+				print "c)reate a new account"
+			
+			print "q)uit"
+			
+			sub_action = raw_input("\nEnter choice => ")
+			
+			if sub_action == "q":
+				return 0
+			elif sub_action == "c" and self.action == "-t":
+				self.create_account()
+			else:
+				try:
+					assert (int(sub_action) > 0),"Your choice must be greater than zero"
+					ID = account_list[int(sub_action)-1][1]
+				except (ValueError, IndexError, AssertionError) as e:
+					print repr(e)
+					exit()
+				
+				if self.action == "-i":
+					self.information(ID)
+				elif self.action == "-h":
+					self.history(ID)
+				elif self.action == "-t":
+					self.transaction(ID)
+
+
+if __name__ == '__main__':
+	
+	if len(sys.argv) != 2:
+		print "Too many or little arguments. There should be one argument"
+		print "-i for showing account information"
+		print "-h for showing transaction history"
+		print "-t for creating a new account or adding a new transaction"
+		exit()
+	else:
+		arg = sys.argv[1]
+	arguments = ['-i', '-h', '-t', '-?']
+	
+	if arg not in arguments:
+		print "Illegal Argument: ", arg
+		exit()
+	
+	path = os.environ.get('ACCT_LIST')
+	if path == None:
+		path = "sample.db"
+		
+	file = open(path, 'r')
+	data = file.read().splitlines()
+	file.close()
+	
+	bank_account = accounts(arg)
+	bank_account.activity_screen(data)
+	try:
+		with open("temp.db") as f:
+			with open(path, "a") as f1:
+				for line in f:
+					f1.write(line)
+		os.remove("temp.db")
+	except IOError:
+		pass
+
