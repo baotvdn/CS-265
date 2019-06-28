@@ -1,0 +1,19 @@
+#!/bin/bash
+#Bao Dang
+#Problem 3: Return a list of message that were on a specific day.
+
+#ARCHIVE="/home/bqd24/CS265/git/bqd24-CS265-fall17/drmath/"
+
+if [ $# -ne 3 ]; then #check if the input has 3 arguments
+	echo "Please enter three arguments like the format yyyy mm dd"
+	exit
+fi
+date="$2/$3/$1"
+
+search_file=$(grep -rl "TimeStamp: $date" $ARCHIVE) #Lookup timestamp of messages that is the same as input 
+
+for file in $search_file; do
+	echo $(basename $file)
+done
+	
+

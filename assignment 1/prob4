@@ -1,0 +1,19 @@
+#!/bin/bash
+#Bao Dang
+#Problem 4: Determine the hostnames and the number messages sent there.
+
+#ARCHIVE="/home/bqd24/CS265/git/bqd24-CS265-fall17/drmath/"
+
+
+for dir in $ARCHIVE/*; do 
+	for file in $dir/*; do
+		grep -m 1 "@" "$file" >> temp #Search for the domains in messages
+	done
+done
+
+awk -F '[@ ]' '{print $3}' temp | sort | uniq -c | sort -nr | 
+awk '{print $2" "$1}
+		END {print "Total "NR}'
+#Keep host name, then sort and remove the duplicated ones
+
+rm temp

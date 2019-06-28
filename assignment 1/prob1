@@ -1,0 +1,16 @@
+#!/bin/bash
+#Bao Dang
+#Problem 1: Determine the number of directories and messages containing problems.
+
+#ARCHIVE="/home/bqd24/CS265/git/bqd24-CS265-fall17/drmath/"
+
+
+for dir in $ARCHIVE/*; do     #Two loops to list directories and files in them 
+	directory=$((directory+1))  #Count the number of directories 
+	for file in $dir/*; do
+		message=$((message+1))		#Count the number of messages 
+	done
+done
+
+echo  "$directory     $message"
+

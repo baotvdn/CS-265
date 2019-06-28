@@ -1,0 +1,31 @@
+#!/bin/bash
+#Bao Dang
+#Problem 2: Determine how many messages are in the longest thread.
+
+#ARCHIVE="/home/bqd24/CS265/git/bqd24-CS265-fall17/drmath/"
+
+
+for dir in $ARCHIVE/*; do
+	for file in $dir/*; do
+		name=$(basename $file)	#Get messages from the folder
+		thread=${name%_*}				#Remove part behind underscore
+		echo "$thread" >> temp	#Put the message into a temporary file
+	done
+done
+
+longest_thread=0						#Initialise longest thread and largest message
+largest_message=''
+
+while read message; do
+	thread_number=$(grep $message temp | wc -l)		#Count the number of message for a thread
+	if [ "$message" != "$largest_message" ] ; then  #Check each thread to compare the number of messages of each thread to the longest thread
+		if [ $thread_number -gt $longest_thread ] ; then
+			longest_thread=$thread_number		#Assign thread as the longest			
+			largest_message=$message
+		fi
+	fi
+done < temp 
+echo "$longest_thread    $largest_message"
+
+rm temp
+
